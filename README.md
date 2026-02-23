@@ -13,8 +13,8 @@ A Web UI tool to measure and log power consumption from **TP-Link Tapo P110** sm
 
 ### **1. Clone the Repository**
 ```sh
-git clone https://github.com/stj2022/tapo_measure_tool.git
-cd tapo_measure_tool
+git clone https://github.com/stj2022/web_measure_tool.git
+cd web_measure_tool
 ```
 
 ### **2. Create a Virtual Environment (Optional but Recommended)**
@@ -46,6 +46,8 @@ python app.py
 ```
 
 Then open **http://localhost:8081** in your browser.
+- If port 8081 is already in use, edit the last line in app.py 
+
 ```
 
 ### **2. Configure Your Settings**
@@ -62,10 +64,16 @@ Then open **http://localhost:8081** in your browser.
 - View real-time power data in the terminal output area.
 - The progress bar updates as the measurement progresses.
 
-### **4. End Measurement**
+### **4. End of Measurement**
 - The CSV file is saved in the selected folder.
 - If the filename already exists, a number (`_1`, `_2`, etc.) is added to the filename automatically.
 - The GUI re-enables once measurement completes.
+
+### **5. Stopping Measurement**
+- Click **Stop Measurement** at any time — data collected so far is saved
+
+### **6. Downloading results**
+- Download any saved CSV from the **Saved Results** panel at the bottom
 
 ## Configuration File
 The tool stores configuration settings in `config.json`, which includes:
@@ -97,21 +105,3 @@ This project is licensed under the **MIT License**. See [LICENSE](LICENSE) for d
 Developed by **Jérémy ALBOUYS PERROIS** for **QUANTEEC**.
 Updated by Simon Jones for Greening of Streaming
 
-
-# WattLab — Web UI
-
-## Setup
-
-```bash
-pip install -r requirements.txt
-```
-
-
-## Usage
-
-1. Enter your Tapo credentials and select/add the device IP
-2. Click **Connect** to verify the device is reachable
-3. Set your filename, interval, and duration
-4. Click **Start Measurement** — live readings stream to the terminal
-5. Click **Stop Measurement** at any time — data collected so far is saved
-6. Download any saved CSV from the **Saved Results** panel at the bottom
