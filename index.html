@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>WattLab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #1e2e22;
+    --bg2:       #2a3d2f;
+    --bg3:       #243329;
+    --accent:    #629e71;
+    --accent2:   #4a7d58;
+    --accent3:   #8fbe9f;
+    --text:      #d4edd9;
+    --text-dim:  #8fbf99;
+    --red:       #c0504d;
+    --red2:      #9a3a38;
+    --border:    rgba(98,158,113,0.25);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Header ── */
+  header {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 0 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    flex-shrink: 0;
+  }
+
+  .logo-area {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .logo-img {
+    height: 42px;
+    width: 42px;
+    object-fit: contain;
+    border-radius: 50%;
+  }
+
+  .logo-text {
+    font-family: 'Space Mono', monospace;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.04em;
+  }
+
+  .logo-sub {
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-top: 1px;
+  }
+
+  .header-status {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--text-dim);
+    transition: background 0.3s;
+  }
+  .dot.connected  { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
+  .dot.measuring  { background: #f0c040; box-shadow: 0 0 6px #f0c040; animation: pulse 1s infinite; }
+  .dot.error      { background: var(--red); }
+
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  /* ── Layout ── */
+  main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    grid-template-rows: auto 1fr auto;
+    gap: 0;
+    max-width: 1100px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 24px 20px;
+    gap: 20px;
+  }
+
+  /* ── Panel ── */
+  .panel {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .panel-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(0,0,0,0.15);
+  }
+
+  .panel-body { padding: 18px; }
+
+  /* ── Form ── */
+  .field { margin-bottom: 14px; }
+  .field:last-child { margin-bottom: 0; }
+
+  label {
+    display: block;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 5px;
+  }
+
+  input, select {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    padding: 8px 12px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input:focus, select:focus { border-color: var(--accent); }
+  input[type="password"] { letter-spacing: 0.15em; }
+
+  .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  .ip-row { display: flex; gap: 6px; }
+  .ip-row select { flex: 1; }
+
+  /* ── Buttons ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border: none;
+    border-radius: 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 14px;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    white-space: nowrap;
+  }
+  .btn:active { transform: scale(0.97); }
+
+  .btn-primary  { background: var(--accent); color: var(--bg); }
+  .btn-primary:hover  { background: var(--accent3); }
+  .btn-secondary { background: var(--bg3); color: var(--text); border: 1px solid var(--border); }
+  .btn-secondary:hover { background: var(--accent2); color: var(--text); }
+  .btn-danger   { background: var(--red); color: #fff; }
+  .btn-danger:hover   { background: var(--red2); }
+  .btn-sm { padding: 6px 10px; font-size: 12px; }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  .btn-row { display: flex; gap: 8px; margin-top: 6px; }
+  .btn-row .btn { flex: 1; }
+
+  /* ── Big start/stop button ── */
+  #measureBtn {
+    width: 100%;
+    padding: 13px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 8px;
+    margin-top: 4px;
+    letter-spacing: 0.03em;
+  }
+
+  /* ── Progress ── */
+  .progress-wrap { margin: 16px 0 8px; }
+  .progress-bar-bg {
+    background: var(--bg3);
+    border-radius: 99px;
+    height: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent2), var(--accent3));
+    border-radius: 99px;
+    width: 0%;
+    transition: width 0.5s ease;
+  }
+  .progress-meta {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 6px;
+  }
+
+  /* ── Live reading ── */
+  .live-reading {
+    text-align: center;
+    padding: 18px 0 10px;
+  }
+  .live-value {
+    font-family: 'Space Mono', monospace;
+    font-size: 42px;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+    transition: color 0.3s;
+  }
+  .live-unit {
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+
+  /* ── Terminal ── */
+  .terminal-wrap {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    display: flex;
+    flex-direction: column;
+  }
+
+  #terminal {
+    flex: 1;
+    background: #0d1a10;
+    color: var(--accent);
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    line-height: 1.7;
+    padding: 16px;
+    overflow-y: auto;
+    min-height: 420px;
+    max-height: 520px;
+    border-radius: 0 0 10px 10px;
+  }
+
+  .term-line { display: flex; gap: 10px; }
+  .term-time { color: var(--text-dim); flex-shrink: 0; }
+  .term-msg  { color: var(--accent); }
+  .term-msg.info   { color: var(--accent3); }
+  .term-msg.error  { color: #e07070; }
+  .term-msg.warn   { color: #f0c040; }
+  .term-msg.success { color: #7dd87d; }
+
+  /* ── Results table ── */
+  .results-panel {
+    grid-column: 1 / 3;
+  }
+
+  #resultsList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 14px 18px;
+    min-height: 56px;
+  }
+
+  .result-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    transition: border-color 0.2s;
+  }
+  .result-chip:hover { border-color: var(--accent); }
+  .result-chip a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 700;
+  }
+  .result-chip a:hover { text-decoration: underline; }
+
+  .empty-msg {
+    font-size: 12px;
+    color: var(--text-dim);
+    padding: 14px 18px;
+    font-style: italic;
+  }
+
+  /* ── Status bar ── */
+  #statusBar {
+    font-size: 13px;
+    color: var(--text-dim);
+    padding: 6px 2px;
+    min-height: 24px;
+    transition: color 0.3s;
+  }
+  #statusBar.ok    { color: var(--accent); }
+  #statusBar.err   { color: #e07070; }
+  #statusBar.warn  { color: #f0c040; }
+
+  /* ── Scrollbar ── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg2); }
+  ::-webkit-scrollbar-thumb { background: var(--accent2); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-area">
+    <img class="logo-img" src="/static/GoSLogo.jpeg" alt="Logo"
+         onerror="this.style.display='none'">
+    <div>
+      <div class="logo-text">WattLab</div>
+      <div class="logo-sub">Power Measurement Tool</div>
+    </div>
+  </div>
+  <div class="header-status">
+    <div class="dot" id="statusDot"></div>
+    <span id="statusText">Idle</span>
+  </div>
+</header>
+
+<main>
+
+  <!-- ── Left panel: config ── -->
+  <div>
+    <div class="panel" style="margin-bottom:16px">
+      <div class="panel-title">Device &amp; Credentials</div>
+      <div class="panel-body">
+        <div class="field">
+          <label>Username</label>
+          <input type="text" id="username" autocomplete="off"/>
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <input type="password" id="password"/>
+        </div>
+        <div class="field">
+          <label>IP Address</label>
+          <div class="ip-row">
+            <select id="ipSelect"></select>
+            <button class="btn btn-secondary btn-sm" onclick="addIP()">+</button>
+            <button class="btn btn-secondary btn-sm" onclick="removeIP()">−</button>
+          </div>
+        </div>
+        <button class="btn btn-secondary" style="width:100%" onclick="connectDevice()">Connect</button>
+        <div id="statusBar" style="margin-top:8px"></div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-bottom:16px">
+      <div class="panel-title">Measurement Settings</div>
+      <div class="panel-body">
+        <div class="field">
+          <label>CSV Filename</label>
+          <input type="text" id="filename" value="measurement_data"/>
+        </div>
+        <div class="row-2">
+          <div class="field">
+            <label>Interval (s)</label>
+            <input type="number" id="interval" value="2" min="0.5" step="0.5"/>
+          </div>
+          <div class="field">
+            <label>Duration (s)</label>
+            <input type="number" id="duration" value="600" min="1"/>
+          </div>
+        </div>
+        <div class="progress-wrap" id="progressWrap" style="display:none">
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="progressFill"></div>
+          </div>
+          <div class="progress-meta">
+            <span id="progressPct">0%</span>
+            <span id="timeRemaining">--s remaining</span>
+          </div>
+        </div>
+        <div class="live-reading" id="liveReading" style="display:none">
+          <div class="live-value" id="liveValue">0</div>
+          <div class="live-unit">mW</div>
+        </div>
+        <button class="btn btn-primary" id="measureBtn" onclick="toggleMeasure()">
+          ▶ Start Measurement
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Right panel: terminal ── -->
+  <div class="terminal-wrap">
+    <div class="panel" style="height:100%;display:flex;flex-direction:column">
+      <div class="panel-title" style="display:flex;justify-content:space-between;align-items:center">
+        <span>Live Output</span>
+        <button class="btn btn-secondary btn-sm" onclick="clearTerminal()">Clear</button>
+      </div>
+      <div id="terminal"></div>
+    </div>
+  </div>
+
+  <!-- ── Bottom panel: results ── -->
+  <div class="panel results-panel">
+    <div class="panel-title" style="display:flex;justify-content:space-between;align-items:center">
+      <span>Saved Results</span>
+      <button class="btn btn-secondary btn-sm" onclick="loadResults()">↻ Refresh</button>
+    </div>
+    <div id="resultsList"><span class="empty-msg">No results yet.</span></div>
+  </div>
+
+</main>
+
+<script>
+  let ws = null;
+  let measuring = false;
+
+  // ── Load config on startup ──────────────────────────────────────────────
+  async function loadConfig() {
+    const r = await fetch("/config");
+    const c = await r.json();
+    document.getElementById("username").value  = c.username  || "";
+    document.getElementById("password").value  = c.password  || "";
+    document.getElementById("filename").value  = c.filename  || "measurement_data";
+    document.getElementById("interval").value  = c.measure_interval || 2;
+    document.getElementById("duration").value  = c.measure_duration || 600;
+    const sel = document.getElementById("ipSelect");
+    sel.innerHTML = "";
+    (c.ip_addresses || []).forEach(ip => {
+      const o = document.createElement("option");
+      o.value = o.textContent = ip;
+      sel.appendChild(o);
+    });
+    if (c.selected_ip) sel.value = c.selected_ip;
+  }
+
+  async function saveConfig() {
+    await fetch("/config", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({
+        username:         document.getElementById("username").value,
+        password:         document.getElementById("password").value,
+        filename:         document.getElementById("filename").value,
+        measure_interval: parseFloat(document.getElementById("interval").value),
+        measure_duration: parseInt(document.getElementById("duration").value),
+        selected_ip:      document.getElementById("ipSelect").value,
+        ip_addresses:     [...document.getElementById("ipSelect").options].map(o => o.value),
+      })
+    });
+  }
+
+  // ── IP management ───────────────────────────────────────────────────────
+  function addIP() {
+    const ip = prompt("Enter IP address:");
+    if (!ip) return;
+    const sel = document.getElementById("ipSelect");
+    const exists = [...sel.options].some(o => o.value === ip);
+    if (!exists) {
+      const o = document.createElement("option");
+      o.value = o.textContent = ip;
+      sel.appendChild(o);
+    }
+    sel.value = ip;
+    saveConfig();
+  }
+
+  function removeIP() {
+    const sel = document.getElementById("ipSelect");
+    if (sel.selectedIndex >= 0) {
+      sel.remove(sel.selectedIndex);
+      saveConfig();
+    }
+  }
+
+  // ── Connect ─────────────────────────────────────────────────────────────
+  async function connectDevice() {
+    setStatus("Connecting...", "warn");
+    setDot("measuring");
+    const r = await fetch("/connect", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({
+        ip:       document.getElementById("ipSelect").value,
+        username: document.getElementById("username").value,
+        password: document.getElementById("password").value,
+      })
+    });
+    const d = await r.json();
+    if (d.ok) {
+      setStatus(d.message, "ok");
+      setDot("connected");
+      term("info", d.message);
+      document.getElementById("measureBtn").disabled = false;
+    } else {
+      setStatus(d.message, "err");
+      setDot("error");
+      term("error", d.message);
+    }
+  }
+
+  // ── Measure ─────────────────────────────────────────────────────────────
+  function toggleMeasure() {
+    if (measuring) stopMeasure();
+    else startMeasure();
+  }
+
+  function startMeasure() {
+    saveConfig();
+    const proto = location.protocol === "https:" ? "wss" : "ws";
+    ws = new WebSocket(`${proto}://${location.host}/ws/measure`);
+
+    ws.onopen = () => {
+      ws.send(JSON.stringify({
+        username:         document.getElementById("username").value,
+        password:         document.getElementById("password").value,
+        ip:               document.getElementById("ipSelect").value,
+        filename:         document.getElementById("filename").value,
+        results_folder:   "./results",
+        measure_interval: parseFloat(document.getElementById("interval").value),
+        measure_duration: parseInt(document.getElementById("duration").value),
+      }));
+    };
+
+    ws.onmessage = (e) => {
+      const msg = JSON.parse(e.data);
+      handleWsMessage(msg);
+    };
+
+    ws.onclose = () => {
+      if (measuring) endMeasure(false);
+    };
+
+    ws.onerror = () => {
+      term("error", "WebSocket error.");
+      endMeasure(false);
+    };
+
+    measuring = true;
+    setDot("measuring");
+    setStatus("Measuring...", "warn");
+    document.getElementById("measureBtn").textContent = "■ Stop Measurement";
+    document.getElementById("measureBtn").className = "btn btn-danger";
+    document.getElementById("progressWrap").style.display = "";
+    document.getElementById("liveReading").style.display = "";
+    setInputsDisabled(true);
+  }
+
+  function stopMeasure() {
+    if (ws) ws.close();
+    fetch("/stop", {method:"POST"});
+  }
+
+  function endMeasure(success) {
+    measuring = false;
+    ws = null;
+    document.getElementById("measureBtn").textContent = "▶ Start Measurement";
+    document.getElementById("measureBtn").className = "btn btn-primary";
+    document.getElementById("progressFill").style.width = success ? "100%" : document.getElementById("progressFill").style.width;
+    setDot(success ? "connected" : "");
+    setInputsDisabled(false);
+    loadResults();
+  }
+
+  function handleWsMessage(msg) {
+    switch(msg.type) {
+      case "status":
+        setStatus(msg.message, "warn");
+        term("info", msg.message);
+        break;
+      case "reading":
+        document.getElementById("liveValue").textContent = msg.power.toLocaleString();
+        document.getElementById("progressFill").style.width = msg.progress + "%";
+        document.getElementById("progressPct").textContent = msg.progress.toFixed(1) + "%";
+        document.getElementById("timeRemaining").textContent = msg.remaining + "s remaining";
+        term("", `${msg.timestamp}  ${String(msg.power).padStart(7)} mW`);
+        break;
+      case "complete":
+        term("success", `✓ ${msg.message}`);
+        setStatus(msg.message, "ok");
+        endMeasure(true);
+        break;
+      case "cancelled":
+        term("warn", `⚠ ${msg.message}`);
+        setStatus(msg.message, "warn");
+        endMeasure(false);
+        break;
+      case "error":
+        term("error", `✗ ${msg.message}`);
+        setStatus(msg.message, "err");
+        setDot("error");
+        endMeasure(false);
+        break;
+    }
+  }
+
+  // ── Results ──────────────────────────────────────────────────────────────
+  async function loadResults() {
+    const r = await fetch("/results");
+    const d = await r.json();
+    const el = document.getElementById("resultsList");
+    if (!d.files || d.files.length === 0) {
+      el.innerHTML = '<span class="empty-msg">No results yet.</span>';
+      return;
+    }
+    el.innerHTML = d.files.map(f => `
+      <div class="result-chip">
+        <span>📄</span>
+        <a href="/download/${encodeURIComponent(f)}" download="${f}">${f}</a>
+      </div>
+    `).join("");
+  }
+
+  // ── Terminal ─────────────────────────────────────────────────────────────
+  function term(cls, message) {
+    const el = document.getElementById("terminal");
+    const now = new Date().toTimeString().slice(0,8);
+    const line = document.createElement("div");
+    line.className = "term-line";
+    line.innerHTML = `<span class="term-time">${now}</span><span class="term-msg ${cls}">${message}</span>`;
+    el.appendChild(line);
+    el.scrollTop = el.scrollHeight;
+  }
+
+  function clearTerminal() {
+    document.getElementById("terminal").innerHTML = "";
+  }
+
+  // ── UI helpers ───────────────────────────────────────────────────────────
+  function setStatus(msg, cls) {
+    const el = document.getElementById("statusBar");
+    el.textContent = msg;
+    el.className = cls || "";
+  }
+
+  function setDot(state) {
+    const d = document.getElementById("statusDot");
+    const t = document.getElementById("statusText");
+    d.className = "dot " + (state || "");
+    t.textContent = state === "connected" ? "Connected"
+                  : state === "measuring" ? "Measuring"
+                  : state === "error"     ? "Error"
+                  : "Idle";
+  }
+
+  function setInputsDisabled(disabled) {
+    ["username","password","filename","interval","duration"].forEach(id => {
+      document.getElementById(id).disabled = disabled;
+    });
+    document.getElementById("ipSelect").disabled = disabled;
+  }
+
+  // ── Init ─────────────────────────────────────────────────────────────────
+  loadConfig();
+  loadResults();
+  term("info", "WattLab ready.");
+</script>
+</body>
+</html>

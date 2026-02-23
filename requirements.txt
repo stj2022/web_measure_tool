@@ -1,0 +1,3 @@
+fastapi
+uvicorn[standard]
+tapo==0.8.1
